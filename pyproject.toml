@@ -1,0 +1,18 @@
+[project]
+name = "ht-patterns-sims"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+discrete-event = [
+    "simpy>=4.1",
+]
+
+[dependency-groups]
+dev = [
+    "pyyaml>=6.0",
+]

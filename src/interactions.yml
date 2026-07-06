@@ -1,0 +1,72 @@
+# Interaction edges between patterns.
+# Each edge: from + to + label + description.
+# Scripts read this to generate interaction-map.md's Mermaid block
+# and to check that all referenced pages exist.
+#
+# Page slugs are relative paths from src/, without .md extension.
+# Run `make check-interactions` after editing.
+
+edges:
+  - from: patterns/overload/retry-storms
+    to: patterns/overload/metastable-failures
+    label: "retries × cold cache → metastable failure"
+    description: >
+      During a cold-cache restart, uncached requests hit backends directly. Clients
+      retry failed or slow requests, multiplying load on already-stressed backends.
+      The amplified load prevents the cache from warming, making the state self-sustaining.
+
+  - from: patterns/tail-latency/hedged-requests
+    to: patterns/overload/goodput-collapse
+    label: "hedging × overload → amplification"
+    description: >
+      Hedged requests fire a second copy when the first is slow. Under high utilization,
+      slow responses are common, so hedging amplifies load at exactly the moment the
+      service can least absorb it, accelerating goodput collapse.
+
+  - from: patterns/capacity/autoscaling-signals
+    to: patterns/overload/goodput-collapse
+    label: "CPU-based autoscaling × IO-bound saturation → no scale-up during brownout"
+    description: >
+      When saturation manifests as queue depth and blocked threads rather than CPU burn,
+      CPU-based autoscaling signals see low utilization and decline to add capacity.
+      The service browns out while the autoscaler observes nothing worth acting on.
+
+  - from: patterns/load-balancing/algorithms-under-stress
+    to: patterns/multitenancy/mixed-request-patterns
+    label: "least-connections LB × heterogeneous cost → herding onto slow hosts"
+    description: >
+      Least-connections routing counts connections, not work. Hosts serving expensive
+      long-running requests look lightly loaded and receive more connections, compounding
+      their saturation while idle hosts remain underutilized.
+
+  - from: patterns/caching/cache-as-hard-dependency
+    to: patterns/overload/goodput-collapse
+    label: "cache-down × unprovisioned backend → cascading overload"
+    description: >
+      Backends are typically provisioned to serve cache-miss traffic, not full load.
+      When a cache fails, 100% of requests reach backends. A 90% hit rate means backends
+      were sized for 10% of traffic; the tenfold load increase cascades to full collapse.
+
+  - from: patterns/overload/deadline-propagation
+    to: patterns/tail-latency/fanout-amplification
+    label: "deadline absence × deep fanout → zombie work amplification"
+    description: >
+      Without deadline propagation, fan-out subtasks continue executing after the
+      top-level deadline has passed. Timed-out requests generate no useful work but
+      consume resources, reducing capacity for requests that can still succeed.
+
+  - from: patterns/inference/prefix-caching
+    to: patterns/multitenancy/mixed-request-patterns
+    label: "prefix-cache routing × hot tenant → load imbalance"
+    description: >
+      Cache-aware routing pins requests with matching prefixes to specific hosts to
+      maximize KV-cache reuse. A hot tenant with a popular system prompt concentrates
+      its traffic on one host, defeating load balancing.
+
+  - from: patterns/capacity/scale-up-lag
+    to: patterns/inference/inference-cold-starts
+    label: "scale-up lag × inference cold starts → surge failure despite autoscaling"
+    description: >
+      Inference workers take minutes to load model weights. When a traffic surge triggers
+      autoscaling, new capacity is not available for several minutes. The surge causes
+      failures during the gap even though autoscaling is working as designed.
