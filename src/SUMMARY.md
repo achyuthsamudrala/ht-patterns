@@ -61,6 +61,16 @@
   - [Criticality Tiers](patterns/dependencies/criticality-tiers.md)
   - [Correlated Failure](patterns/dependencies/correlated-failure.md)
 
+- [Databases](patterns/databases/index.md)
+  - [Replication Lag](patterns/databases/replication-lag.md)
+  - [Read/Write Splitting](patterns/databases/read-write-splitting.md)
+  - [Lock Contention and Deadlocks](patterns/databases/lock-contention-and-deadlocks.md)
+  - [Optimistic Concurrency Control](patterns/databases/optimistic-concurrency-control.md)
+  - [Write Skew and Read/Write Conflicts](patterns/databases/write-skew-and-read-write-conflicts.md)
+  - [Connection Pool Exhaustion](patterns/databases/connection-pool-exhaustion.md)
+  - [Hot Partitions and Sequential Keys](patterns/databases/hot-partitions-and-sequential-keys.md)
+  - [Failover and Split-Brain](patterns/databases/failover-and-split-brain.md)
+
 - [Pipeline](patterns/pipeline/index.md)
   - [Staged Architectures](patterns/pipeline/staged-architectures.md)
   - [Concurrency Models](patterns/pipeline/concurrency-models.md)

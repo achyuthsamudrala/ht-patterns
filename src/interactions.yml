@@ -70,3 +70,28 @@ edges:
       Inference workers take minutes to load model weights. When a traffic surge triggers
       autoscaling, new capacity is not available for several minutes. The surge causes
       failures during the gap even though autoscaling is working as designed.
+
+  - from: patterns/databases/connection-pool-exhaustion
+    to: patterns/overload/retry-storms
+    label: "pool exhaustion × client retries → self-reinforcing saturation"
+    description: >
+      When the database connection pool is exhausted, requests fail or time out waiting
+      for a connection. Clients retry, adding more connection acquisition attempts on top
+      of a pool that is already full, extending the exhaustion rather than relieving it.
+
+  - from: patterns/databases/replication-lag
+    to: patterns/databases/failover-and-split-brain
+    label: "async replica lag × promotion under failure → silent data loss"
+    description: >
+      A replica promoted during failover carries whatever it had replicated at the moment
+      of promotion, not the primary's most recent commits. Higher lag at the instant of
+      failure means more committed writes are permanently unreachable through the new
+      topology, with no error raised at write time to flag it.
+
+  - from: patterns/databases/optimistic-concurrency-control
+    to: patterns/databases/hot-partitions-and-sequential-keys
+    label: "OCC retries × hot key → wasted-work amplification"
+    description: >
+      A hot key under concurrent writes forces most optimistic-concurrency attempts to
+      lose the race and retry. Each retry re-reads and re-writes the same already-hot
+      row, adding load to exactly the shard that is already the cluster's bottleneck.

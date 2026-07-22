@@ -91,7 +91,9 @@ The incident-mode entry point. Find your observable below, then follow the discr
 
 - Client timeout shorter than server processing time → [Deadline Propagation](patterns/overload/deadline-propagation.md)
 - Slow upstream dependency → [Slow Is Worse Than Down](patterns/dependencies/slow-is-worse-than-down.md)
-- Connection pool exhaustion → [Connection Management](patterns/load-balancing/connection-management.md)
+- Connection pool exhaustion at the load balancer or proxy → [Connection Management](patterns/load-balancing/connection-management.md)
+- "Too many connections" errors from the database itself, worse after autoscaling → [Connection Pool Exhaustion](patterns/databases/connection-pool-exhaustion.md)
+- Write blocked waiting on a row/table lock → [Lock Contention and Deadlocks](patterns/databases/lock-contention-and-deadlocks.md)
 
 ### Error rate oscillates
 
@@ -103,6 +105,7 @@ The incident-mode entry point. Find your observable below, then follow the discr
 
 - Quota exhaustion → [Cost-Aware Quotas](patterns/multitenancy/cost-aware-quotas.md)
 - Hot key on a shared cache shard → [Hot Keys](patterns/caching/hot-keys.md)
+- One database shard/partition far hotter than its siblings → [Hot Partitions and Sequential Keys](patterns/databases/hot-partitions-and-sequential-keys.md)
 - Tenant blast radius not contained → [Shuffle Sharding](patterns/multitenancy/shuffle-sharding.md) or [Bulkheads](patterns/dependencies/bulkheads.md)
 - One tenant's long requests blocking others' short ones → [Fair Scheduling](patterns/multitenancy/fair-scheduling.md)
 
@@ -115,6 +118,34 @@ The incident-mode entry point. Find your observable below, then follow the discr
 
 - In-flight requests dropped during scale-down → [Scale-Down Safety](patterns/capacity/scale-down-safety.md)
 - Instance removed from LB without draining → [Scale-Down Safety](patterns/capacity/scale-down-safety.md)
+
+---
+
+## Data Consistency
+
+### A write isn't visible on the very next read
+
+- Read routed to a replica pool, not the primary → [Replication Lag](patterns/databases/replication-lag.md)
+- Read/write routing is by statement shape, not per-query freshness need → [Read/Write Splitting](patterns/databases/read-write-splitting.md)
+
+### Cross-row invariant violated with no error at write time
+
+- Snapshot isolation / REPEATABLE READ in use, both writers read the same snapshot → [Write Skew and Read/Write Conflicts](patterns/databases/write-skew-and-read-write-conflicts.md)
+
+### Write returns a conflict/version error under concurrency
+
+- Conflicts concentrated on one popular record → [Optimistic Concurrency Control](patterns/databases/optimistic-concurrency-control.md)
+- Conflicts concentrated on one shard, not one record → [Hot Partitions and Sequential Keys](patterns/databases/hot-partitions-and-sequential-keys.md)
+
+### Deadlock or lock-wait-timeout errors on writes
+
+- Long transaction holding locks during unrelated I/O → [Lock Contention and Deadlocks](patterns/databases/lock-contention-and-deadlocks.md)
+- Range query taking gap locks under REPEATABLE READ → [Lock Contention and Deadlocks](patterns/databases/lock-contention-and-deadlocks.md)
+
+### Data divergence discovered after a database failover
+
+- Async replica promoted with unreplicated tail of writes → [Replication Lag](patterns/databases/replication-lag.md)
+- Old primary kept accepting writes after a partial network partition → [Failover and Split-Brain](patterns/databases/failover-and-split-brain.md)
 
 ---
 

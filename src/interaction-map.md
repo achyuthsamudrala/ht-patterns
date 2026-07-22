@@ -18,6 +18,9 @@ graph TD
     scale-down["Scale-Down Safety"] -->|"premature removal × cold start"| cold-starts["Cold Starts"]
     correlated-fail["Correlated Failure"] -->|"blast radius × no shuffle sharding"| shuffle["Shuffle Sharding"]
     backpressure["Backpressure"] -->|"downstream bound × shared pool"| deadlock["Staged Architectures deadlock"]
+    pool-exhaustion["Connection Pool Exhaustion"] -->|"pool exhaustion × client retries"| retry-storms
+    replication-lag["Replication Lag"] -->|"async lag × promotion"| failover["Failover and Split-Brain"]
+    occ["Optimistic Concurrency Control"] -->|"OCC retries × hot key"| hot-partitions["Hot Partitions and Sequential Keys"]
 ```
 
 ---
@@ -117,3 +120,27 @@ When tenants share infrastructure without isolation, a correlated failure (power
 In a staged architecture where stages share a thread pool, a thread blocked writing to a full downstream queue cannot release its thread. Other threads accumulate in the same state. With all threads blocked, the downstream stage cannot drain its queue (no threads available), completing the deadlock.
 
 **Pages:** [Staged Architectures](patterns/pipeline/staged-architectures.md) · [Backpressure](patterns/overload/backpressure.md)
+
+---
+
+### Connection pool exhaustion × client retries → self-reinforcing saturation
+
+When the database connection pool is exhausted, requests fail or time out waiting for a connection. Clients retry, adding more connection acquisition attempts on top of a pool that is already full, extending the exhaustion rather than relieving it.
+
+**Pages:** [Connection Pool Exhaustion](patterns/databases/connection-pool-exhaustion.md) · [Retry Storms](patterns/overload/retry-storms.md)
+
+---
+
+### Async replica lag × promotion under failure → silent data loss
+
+A replica promoted during failover carries whatever it had replicated at the moment of promotion, not the primary's most recent commits. Higher lag at the instant of failure means more committed writes are permanently unreachable through the new topology, with no error raised at write time to flag it.
+
+**Pages:** [Replication Lag](patterns/databases/replication-lag.md) · [Failover and Split-Brain](patterns/databases/failover-and-split-brain.md)
+
+---
+
+### OCC retries × hot key → wasted-work amplification
+
+A hot key under concurrent writes forces most optimistic-concurrency attempts to lose the race and retry. Each retry re-reads and re-writes the same already-hot row, adding load to exactly the shard that is already the cluster's bottleneck.
+
+**Pages:** [Optimistic Concurrency Control](patterns/databases/optimistic-concurrency-control.md) · [Hot Partitions and Sequential Keys](patterns/databases/hot-partitions-and-sequential-keys.md)

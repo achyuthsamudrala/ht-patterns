@@ -46,6 +46,40 @@ Annotated bibliography, grouped by topic.
 
 ---
 
+## Databases
+
+- Kung, H.T. and Robinson, J.T. **"On Optimistic Methods for Concurrency Control."** *ACM Transactions on Database Systems*, 6(2), 1981.
+  The original formulation of optimistic concurrency control's read/validate/write phases.
+
+- Kleppmann, M. **Designing Data-Intensive Applications.** O'Reilly, 2017.
+  Chapters 5–7 are the comprehensive reference for replication lag, read-your-writes, write skew, and transaction isolation levels underlying this entire chapter.
+
+- Fekete, A. et al. **"Making Snapshot Isolation Serializable."** *ACM Transactions on Database Systems*, 30(2), 2005.
+  Formalizes write skew and characterizes which transaction schemas are vulnerable under snapshot isolation.
+
+- Cahill, M., Röhm, U., and Fekete, A. **"Serializable Isolation for Snapshot Databases."** *SIGMOD 2008*.
+  Introduces Serializable Snapshot Isolation (SSI), the algorithm behind PostgreSQL's `SERIALIZABLE` isolation level.
+
+- Bernstein, P. and Newcomer, E. **Principles of Transaction Processing**, 2nd ed. Morgan Kaufmann, 2009.
+  The standard reference on two-phase locking, deadlock detection, and victim selection.
+
+- Verbitski, A. et al. **"Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases."** *SIGMOD 2017*.
+  Describes a storage architecture that pushes replica lag down to single-digit milliseconds by replicating below the database engine.
+
+- Corbett, J. et al. **"Spanner: Google's Globally-Distributed Database."** *OSDI 2012*.
+  Quorum-based (Paxos) leader election per data shard as a structural alternative to heuristic single-primary failover.
+
+- DeCandia, G. et al. **"Dynamo: Amazon's Highly Available Key-value Store."** *SOSP 2007*.
+  Foundational paper on consistent hashing and the load-balancing tradeoffs of different partitioning schemes.
+
+- GitHub. **"October 21 post-incident analysis."** *GitHub Engineering Blog*, 2018.
+  A detailed public account of a network partition producing divergent writes across a failed-over MySQL topology.
+
+- Instagram Engineering. **"Sharding & IDs at Instagram."** *Instagram Engineering Blog*, 2012.
+  The 64-bit timestamp/shard/sequence ID scheme designed to avoid sequential-key hotspotting while preserving time-sortability.
+
+---
+
 ## Load Balancing and Consistent Hashing
 
 - Karger, D. et al. **"Consistent Hashing and Random Trees."** *STOC 1997*.
